@@ -1,0 +1,13 @@
+app:
+	name: NeuroCore Defeense
+	version:1.0
+
+ml:
+	enabled: true
+	
+response:
+	auto_block: true
+	
+api:
+	endpoint: "http://localhost:8000/events"
+	api_key: "CHANGE_ME"
