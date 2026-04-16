@@ -2,7 +2,7 @@ import re
 
 LOG_REGEX = re.compile(r'(\d+\.\d+\.\d+\.\d+).*"(GET|POST).*" (\d+)')
 
-def parse_ngix_line(line):
+def parse_nginx_line(line):
 	match = LOG_REGEX.search(line)
 	if not match:
 		return None
@@ -12,6 +12,6 @@ def parse_ngix_line(line):
 	return {
 		"type": "http_request",
 		"ip": ip,
-		"request_rate": 1
-		"pauload": line
+		"request_rate": 1,
+		"payload": line
 	}

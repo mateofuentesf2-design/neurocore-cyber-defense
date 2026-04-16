@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+
+  db:
+    image: postgres:15
+    container_name: neurocore_db
+    restart: always
+    environment:
+      POSTGRES_USER: neurocore
+      POSTGRES_PASSWORD: neurocorepass
+      POSTGRES_DB: neurocore
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: neurocore_backend
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: db
+      DB_USER: neurocore
+      DB_PASSWORD: neurocorepass
+      DB_NAME: neurocore
+    volumes:
+      - .:/app
+
+  dashboard:
+    build: ./dashboard
+    container_name: neurocore_dashboard
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

@@ -1,2 +1,3 @@
 def respond(event):
-	print("[RESPONSE] Port scanning detected")
+    ip = event.get("ip", "unknown")
+    print(f"[RESPONSE] Potential port scan from {ip}")

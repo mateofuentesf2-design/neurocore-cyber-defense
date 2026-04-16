@@ -1,21 +1,14 @@
 import numpy as np
-from sklearn.ensemble import IsolationForest
+import joblib
+import os
 
-class AnomalyDetector:
-	
-	def __init__(self):
-		self.model = IsolationForest(contamination=0.1)
-		self.trained = False
-	
-	def train(self, data):
-		data = np.random.rand(100, 4)
-		self.model.fit(data)
-		self.trained = True
-		
-	def predict(self, sample):
-		if not self.trained:
-			self:train()
-			
-		result = self.model.predict([features])
-		return result[0] == -1
-		
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "model.pkl")
+
+model = joblib.load(MODEL_PATH)
+
+def detect_anomaly(features):
+    X = np.array(features).reshape(1, -1)
+
+    prediction = model.predict(X)[0]
+
+    return prediction == -1

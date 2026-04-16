@@ -1,2 +1,12 @@
 def detect(event):
-	return event.get("ports_accessed", 0) > 50
+    raw = event.get("raw", "").lower()
+
+    keywords = [
+        "scan",
+        "nmap",
+        "port scan",
+        "syn scan",
+        "probing"
+    ]
+
+    return any(k in raw for k in keywords)

@@ -1,5 +1,22 @@
+# Python
 venv/
 __pycache__/
 *.pyc
+
+# Env
 .env
+
+# Mac
+.DS_Store
+
+# Logs
 *.log
+
+# DB
+*.sqlite3
+
+# Node (si agregas frontend luego)
+node_modules/
+
+# Docker
+*.pid
