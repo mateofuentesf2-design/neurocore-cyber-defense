@@ -1,15 +1,14 @@
 from fastapi import APIRouter, Request, Depends
-from backend.db import get_connection
+from backend.db import get_connection, normalize_query
 from backend.websocket_manager import manager
-from fastapi import APIRouter, Depends
-from backend.auth import validate_api_key
 
 import asyncio
+import json
+import os
 
 router = APIRouter()
 
 from backend.auth_jwt import verify_token
-from fastapi import Depends
 
 @router.get("/events")
 def get_events(user=Depends(verify_token)):
@@ -18,10 +17,10 @@ def get_events(user=Depends(verify_token)):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        "SELECT id, source, raw, created_at FROM events WHERE tenant_id=%s ORDER BY id DESC LIMIT 100",
-        (tenant_id,)
+    query = normalize_query(
+        "SELECT id, source, raw, created_at FROM events WHERE tenant_id=%s ORDER BY id DESC LIMIT 100"
     )
+    cursor.execute(query, (tenant_id,))
 
     rows = cursor.fetchall()
 
@@ -49,13 +48,10 @@ async def receive_event(request: Request, user=Depends(verify_token)):
         conn = get_connection()
         cursor = conn.cursor()
 
-        cursor.execute(
-            """
-            INSERT INTO events (source, raw, tenant_id)
-            VALUES (%s, %s, %s)
-            """,
-            (event.get("source"), event.get("raw"), tenant_id)
+        query = normalize_query(
+            "INSERT INTO events (source, raw, tenant_id) VALUES (%s, %s, %s)"
         )
+        cursor.execute(query, (event.get("source"), event.get("raw"), tenant_id))
 
         conn.commit()
         cursor.close()
@@ -66,9 +62,12 @@ async def receive_event(request: Request, user=Depends(verify_token)):
     except Exception as e:
         print("❌ DB ERROR:", e)
 
-    asyncio.create_task(manager.broadcast({
-        **event,
-        "tenant_id": tenant_id
-    }))
+    try:
+        asyncio.create_task(manager.broadcast({
+            **event,
+            "tenant_id": tenant_id
+        }))
+    except Exception as e:
+        print(f"⚠️ WebSocket broadcast error: {e}")
 
     return {"status": "stored"}

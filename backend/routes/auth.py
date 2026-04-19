@@ -6,17 +6,9 @@ from backend.auth_jwt import create_token
 
 router = APIRouter()
 
-# ==============================
-# 📥 REQUEST MODEL
-# ==============================
-
 class LoginRequest(BaseModel):
     username: str
     password: str
-
-# ==============================
-# 🔐 LOGIN
-# ==============================
 
 @router.post("/login")
 def login(data: LoginRequest):
@@ -24,12 +16,11 @@ def login(data: LoginRequest):
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT username, password, tenant_id FROM users WHERE username=%s",
+        "SELECT username, password, tenant_id FROM users WHERE username=?",
         (data.username,)
     )
 
     user = cursor.fetchone()
-
     cursor.close()
     conn.close()
 

@@ -6,18 +6,13 @@ from core.engine import process_event
 
 import requests
 
+import requests
+
+API_URL = "http://127.0.0.1:8000/events"
+
 def send_event_to_api(event):
     try:
-        response = requests.post(
-            "http://127.0.0.1:8000/events",
-            json=event,
-            headers={
-                "x-api-key": "abc123securekey"
-            }
-        )
-
-        print("[API RESPONSE]", response.status_code)
-
+        requests.post(API_URL, json=event)
     except Exception as e:
         print("[API ERROR]", e)
 
